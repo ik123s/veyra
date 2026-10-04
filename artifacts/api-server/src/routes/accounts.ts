@@ -29,7 +29,7 @@ import {
 import { requireAuth } from "../middlewares/requireAuth";
 
 const router: IRouter = Router();
-const STARTING_BALANCE = 50_000;
+const STARTING_BALANCE = 500_000_000;
 
 router.use(requireAuth);
 
@@ -101,14 +101,14 @@ router.post("/accounts", async (req, res): Promise<void> => {
         amount: STARTING_BALANCE,
         transactionType: "welcome_credit",
         status: "completed",
-        title: "Starting demo balance",
+        title: "Starting virtual balance",
       });
       await tx.insert(fintechNotificationsTable).values({
         userId,
         type: "account_ready",
         title: "Your demo wallet is ready",
         message:
-          "₦50,000 Virtual Balance / Demo Money has been added. It has no real monetary value.",
+          "₦500,000,000 Virtual Balance / Demo Money has been added. It has no real monetary value.",
       });
     });
   } catch (error) {

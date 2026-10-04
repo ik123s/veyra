@@ -9,6 +9,7 @@ import {
   fintechTransactionsTable,
   fintechWalletsTable,
 } from "@workspace/db";
+import { isAdminUser } from "./admin-access";
 
 const senderProfile = alias(fintechProfilesTable, "sender_profile");
 const recipientProfile = alias(fintechProfilesTable, "recipient_profile");
@@ -18,12 +19,19 @@ export async function getUserProfile(userId: string) {
     .select({
       id: fintechProfilesTable.id,
       originalName: fintechProfilesTable.originalName,
+      firstName: fintechProfilesTable.firstName,
+      lastName: fintechProfilesTable.lastName,
       username: fintechProfilesTable.username,
       accountNumber: fintechProfilesTable.accountNumber,
+      phone: fintechProfilesTable.phone,
+      dateOfBirth: fintechProfilesTable.dateOfBirth,
       createdAt: fintechProfilesTable.createdAt,
       virtualBalance: fintechWalletsTable.balance,
       showUsername: fintechSettingsTable.showUsername,
+      phoneSearchEnabled: fintechSettingsTable.phoneSearchEnabled,
       notificationsEnabled: fintechSettingsTable.notificationsEnabled,
+      sessionTimeoutMinutes: fintechSettingsTable.sessionTimeoutMinutes,
+      lockOnReturn: fintechSettingsTable.lockOnReturn,
       theme: fintechSettingsTable.theme,
       pinSet: fintechSecurityTable.userId,
     })
@@ -43,8 +51,14 @@ export async function getUserProfile(userId: string) {
     .where(eq(fintechProfilesTable.id, userId));
 
   if (!row) return null;
+  const nameParts = row.originalName.trim().split(/\s+/);
   return {
     ...row,
+    firstName: row.firstName ?? nameParts[0] ?? "",
+    lastName: row.lastName ?? nameParts.slice(1).join(" "),
+    isAdmin: isAdminUser(userId),
+    dateOfBirth: row.dateOfBirth ?? null,
+    phone: row.phone ?? null,
     createdAt: row.createdAt.toISOString(),
     pinSet: row.pinSet !== null,
   };

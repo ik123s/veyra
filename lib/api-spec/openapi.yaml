@@ -76,7 +76,7 @@ paths:
       operationId: createMyAccount
       tags: [accounts]
       summary: Create the authenticated user's in-app account and demo wallet
-      description: Creates one private profile with a ₦50,000 Virtual Balance / Demo Money starting balance. The balance has no real monetary value.
+      description: Creates one private profile with a ₦500,000,000 Virtual Balance / Demo Money starting balance. The balance has no real monetary value.
       requestBody:
         required: true
         content:
@@ -309,29 +309,47 @@ components:
       properties:
         id: { type: string }
         originalName: { type: string }
+        firstName: { type: string }
+        lastName: { type: string }
         username: { type: string }
         accountNumber: { type: string }
+        phone: { type: ["string", "null"] }
+        dateOfBirth: { type: ["string", "null"], format: date }
         virtualBalance: { type: integer, minimum: 0 }
         showUsername: { type: boolean }
+        phoneSearchEnabled: { type: boolean }
         notificationsEnabled: { type: boolean }
+        sessionTimeoutMinutes: { type: integer, enum: [5, 15, 30, 60] }
+        lockOnReturn: { type: boolean }
         theme: { type: string, enum: [light, dark] }
+        isAdmin: { type: boolean }
         createdAt: { type: string, format: date-time }
         pinSet: { type: boolean }
-      required: [id, originalName, username, accountNumber, virtualBalance, showUsername, notificationsEnabled, theme, createdAt, pinSet]
+      required: [id, originalName, firstName, lastName, username, accountNumber, phone, dateOfBirth, virtualBalance, showUsername, phoneSearchEnabled, notificationsEnabled, sessionTimeoutMinutes, lockOnReturn, theme, isAdmin, createdAt, pinSet]
     AccountRegistrationInput:
       type: object
       properties:
-        originalName: { type: string, minLength: 2, maxLength: 100 }
+        firstName: { type: string, minLength: 1, maxLength: 50 }
+        lastName: { type: string, minLength: 1, maxLength: 50 }
         username: { type: string, minLength: 3, maxLength: 24, pattern: "^[a-zA-Z0-9_]+$" }
+        phone: { type: string, pattern: "^\\+234[789][0-9]{9}$" }
+        dateOfBirth: { type: string, format: date }
         pin: { type: string, pattern: "^[0-9]{4,6}$" }
-      required: [originalName, username, pin]
+      required: [firstName, lastName, username, phone, dateOfBirth, pin]
     ProfileUpdate:
       type: object
       properties:
         originalName: { type: string, minLength: 2, maxLength: 100 }
+        firstName: { type: string, minLength: 1, maxLength: 50 }
+        lastName: { type: string, minLength: 1, maxLength: 50 }
         username: { type: string, minLength: 3, maxLength: 24, pattern: "^[a-zA-Z0-9_]+$" }
+        phone: { type: ["string", "null"], pattern: "^\\+234[789][0-9]{9}$" }
+        dateOfBirth: { type: ["string", "null"], format: date }
         showUsername: { type: boolean }
+        phoneSearchEnabled: { type: boolean }
         notificationsEnabled: { type: boolean }
+        sessionTimeoutMinutes: { type: integer, enum: [5, 15, 30, 60] }
+        lockOnReturn: { type: boolean }
         theme: { type: string, enum: [light, dark] }
     Recipient:
       type: object

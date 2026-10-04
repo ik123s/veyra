@@ -10,7 +10,7 @@ export const fintechWalletsTable = pgTable(
     userId: text("user_id")
       .primaryKey()
       .references(() => fintechProfilesTable.id, { onDelete: "cascade" }),
-    balance: bigint("balance", { mode: "number" }).notNull().default(50000),
+    balance: bigint("balance", { mode: "number" }).notNull().default(500000000),
   },
   (table) => [check("fintech_wallets_nonnegative_balance", sql`${table.balance} >= 0`)],
 );

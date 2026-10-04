@@ -104,7 +104,7 @@ function SignInPage() {
   return <div className="clerk-page"><div className="clerk-page-art"><div className="clerk-art-mark">₦</div><span className="eyebrow">A SAFE SPACE TO PRACTISE</span><h1>Your next step,<br /><em>without the risk.</em></h1><p>Sign in to return to your Naira Demo account and pick up where you left off.</p></div><div className="clerk-widget-wrap"><SignIn routing="path" path={`${basePath}/sign-in`} signUpUrl={`${basePath}/sign-up`} forceRedirectUrl={`${basePath}/dashboard`} /></div></div>;
 }
 function SignUpPage() {
-  return <div className="clerk-page"><div className="clerk-page-art"><div className="clerk-art-mark">₦</div><span className="eyebrow">START WITH A VIRTUAL BALANCE</span><h1>Build confidence,<br /><em>one safe step.</em></h1><p>Your account starts with ₦50,000 Virtual Balance / Demo Money. No real money is ever involved.</p></div><div className="clerk-widget-wrap"><SignUp routing="path" path={`${basePath}/sign-up`} signInUrl={`${basePath}/sign-in`} forceRedirectUrl={`${basePath}/onboarding`} /></div></div>;
+  return <div className="clerk-page"><div className="clerk-page-art"><div className="clerk-art-mark">₦</div><span className="eyebrow">START WITH A VIRTUAL BALANCE</span><h1>Build confidence,<br /><em>one safe step.</em></h1><p>Your account starts with ₦500,000,000 Virtual Balance / Demo Money. No real money is ever involved.</p></div><div className="clerk-widget-wrap"><SignUp routing="path" path={`${basePath}/sign-up`} signInUrl={`${basePath}/sign-in`} forceRedirectUrl={`${basePath}/onboarding`} /></div></div>;
 }
 
 function RouteSwitch() {
