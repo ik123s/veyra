@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "Naira Demo"
+description = "A mobile-first Nigerian fintech simulation where users manage private demo wallets, verify recipients, send internal virtual funds, and explore clearly labeled simulated services. All balances have no real monetary value and no real banking or payment connections."
+version = "1.0.0"
+id = "artifacts/naira-demo"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 25137
+
+[services.development]
+run = "pnpm --filter @workspace/naira-demo run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/naira-demo", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/naira-demo/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "25137"
+BASE_PATH = "/"

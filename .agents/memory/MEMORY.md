@@ -1,0 +1,1 @@
+- [Virtual-money policy](virtual-money-policy.md) — New wallets start at ₦50,000; every balance and service remains demo-only with no real payment connections.

@@ -3,13 +3,23 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Private account and internal-only virtual wallet API for the Naira Demo simulation.
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: accounts
+    description: Authenticated account profile and recipient lookup
+  - name: wallet
+    description: Current user's virtual wallet and statistics
+  - name: transfers
+    description: Internal simulated transfers only
+  - name: activity
+    description: Private transaction history and in-app notifications
+  - name: simulations
+    description: Non-financial mock service activity; never debits a wallet
 paths:
   /healthz:
     get:
@@ -24,6 +34,267 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /accounts/me:
+    get:
+      operationId: getMyAccount
+      tags: [accounts]
+      summary: Get the authenticated user's profile and virtual balance
+      responses:
+        "200":
+          description: Current user's account
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProfile"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    patch:
+      operationId: updateMyAccount
+      tags: [accounts]
+      summary: Update the authenticated user's profile and preferences
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProfileUpdate"
+      responses:
+        "200":
+          description: Updated account
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProfile"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+  /accounts:
+    post:
+      operationId: createMyAccount
+      tags: [accounts]
+      summary: Create the authenticated user's in-app account and demo wallet
+      description: Creates one private profile with a ₦50,000 Virtual Balance / Demo Money starting balance. The balance has no real monetary value.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AccountRegistrationInput"
+      responses:
+        "201":
+          description: Account created with the initial demo balance
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProfile"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "409":
+          description: Username is already in use or an account already exists
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /accounts/search:
+    get:
+      operationId: searchAccount
+      tags: [accounts]
+      summary: Find one recipient by exact username or account number
+      parameters:
+        - in: query
+          name: query
+          required: true
+          schema:
+            type: string
+            minLength: 3
+      responses:
+        "200":
+          description: Verified recipient details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Recipient"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /wallet/stats:
+    get:
+      operationId: getWalletStats
+      tags: [wallet]
+      summary: Get private wallet totals and recent activity statistics
+      responses:
+        "200":
+          description: Current user's virtual wallet statistics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WalletStats"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+  /transfers:
+    post:
+      operationId: createTransfer
+      tags: [transfers]
+      summary: Send virtual funds to another registered account
+      description: Atomically debits and credits two in-app wallets after PIN verification. It never contacts banks or payment services.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TransferInput"
+      responses:
+        "201":
+          description: Completed internal virtual transfer
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Transaction"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          description: Insufficient funds or invalid transfer state
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /transactions:
+    get:
+      operationId: listTransactions
+      tags: [activity]
+      summary: List the authenticated user's own transaction history
+      responses:
+        "200":
+          description: Private transaction history
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Transaction"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+  /transactions/{transactionId}:
+    get:
+      operationId: getTransaction
+      tags: [activity]
+      summary: Get one transaction in which the authenticated user participated
+      parameters:
+        - in: path
+          name: transactionId
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Transaction detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Transaction"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /notifications:
+    get:
+      operationId: listNotifications
+      tags: [activity]
+      summary: List the authenticated user's in-app notifications
+      responses:
+        "200":
+          description: Private notifications
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Notification"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+  /notifications/{notificationId}:
+    patch:
+      operationId: updateNotification
+      tags: [activity]
+      summary: Mark one of the authenticated user's notifications read or unread
+      parameters:
+        - in: path
+          name: notificationId
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NotificationUpdate"
+      responses:
+        "200":
+          description: Updated notification
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Notification"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /security/pin:
+    patch:
+      operationId: changePin
+      tags: [accounts]
+      summary: Change the authenticated user's security PIN
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PinChangeInput"
+      responses:
+        "204":
+          description: PIN changed
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+  /services/simulate:
+    post:
+      operationId: simulateService
+      tags: [simulations]
+      summary: Save an in-app simulation activity without moving money
+      description: Creates a simulated service record only. The wallet balance is not changed and no external provider is contacted.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ServiceSimulationInput"
+      responses:
+        "201":
+          description: Simulation activity recorded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Transaction"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
 components:
   schemas:
     HealthStatus:
@@ -33,4 +304,126 @@ components:
           type: string
       required:
         - status
+    UserProfile:
+      type: object
+      properties:
+        id: { type: string }
+        originalName: { type: string }
+        username: { type: string }
+        accountNumber: { type: string }
+        virtualBalance: { type: integer, minimum: 0 }
+        showUsername: { type: boolean }
+        notificationsEnabled: { type: boolean }
+        theme: { type: string, enum: [light, dark] }
+        createdAt: { type: string, format: date-time }
+        pinSet: { type: boolean }
+      required: [id, originalName, username, accountNumber, virtualBalance, showUsername, notificationsEnabled, theme, createdAt, pinSet]
+    AccountRegistrationInput:
+      type: object
+      properties:
+        originalName: { type: string, minLength: 2, maxLength: 100 }
+        username: { type: string, minLength: 3, maxLength: 24, pattern: "^[a-zA-Z0-9_]+$" }
+        pin: { type: string, pattern: "^[0-9]{4,6}$" }
+      required: [originalName, username, pin]
+    ProfileUpdate:
+      type: object
+      properties:
+        originalName: { type: string, minLength: 2, maxLength: 100 }
+        username: { type: string, minLength: 3, maxLength: 24, pattern: "^[a-zA-Z0-9_]+$" }
+        showUsername: { type: boolean }
+        notificationsEnabled: { type: boolean }
+        theme: { type: string, enum: [light, dark] }
+    Recipient:
+      type: object
+      properties:
+        originalName: { type: string }
+        username: { type: string }
+        accountNumber: { type: string }
+      required: [originalName, username, accountNumber]
+    WalletStats:
+      type: object
+      properties:
+        virtualBalance: { type: integer, minimum: 0 }
+        totalSent: { type: integer, minimum: 0 }
+        totalReceived: { type: integer, minimum: 0 }
+        transactionCount: { type: integer, minimum: 0 }
+        monthlySent: { type: integer, minimum: 0 }
+        monthlyReceived: { type: integer, minimum: 0 }
+      required: [virtualBalance, totalSent, totalReceived, transactionCount, monthlySent, monthlyReceived]
+    TransferInput:
+      type: object
+      properties:
+        clientRequestId: { type: string, format: uuid }
+        recipientAccountNumber: { type: string, minLength: 6, maxLength: 20 }
+        amount: { type: integer, minimum: 1, maximum: 100000000 }
+        pin: { type: string, pattern: "^[0-9]{4,6}$" }
+      required: [clientRequestId, recipientAccountNumber, amount, pin]
+    Transaction:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        transactionId: { type: string }
+        senderUsername: { type: ["string", "null"] }
+        senderName: { type: ["string", "null"] }
+        recipientUsername: { type: ["string", "null"] }
+        recipientName: { type: ["string", "null"] }
+        amount: { type: integer, minimum: 0 }
+        transactionType: { type: string }
+        status: { type: string, enum: [completed, simulated] }
+        createdAt: { type: string, format: date-time }
+        direction: { type: string, enum: [sent, received, activity, welcome] }
+        title: { type: string }
+      required: [id, transactionId, amount, transactionType, status, createdAt, direction, title]
+    Notification:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        type: { type: string }
+        title: { type: string }
+        message: { type: string }
+        isRead: { type: boolean }
+        createdAt: { type: string, format: date-time }
+      required: [id, type, title, message, isRead, createdAt]
+    NotificationUpdate:
+      type: object
+      properties:
+        isRead: { type: boolean }
+      required: [isRead]
+    PinChangeInput:
+      type: object
+      properties:
+        currentPin: { type: string, pattern: "^[0-9]{4,6}$" }
+        newPin: { type: string, pattern: "^[0-9]{4,6}$" }
+      required: [currentPin, newPin]
+    ServiceSimulationInput:
+      type: object
+      properties:
+        serviceType: { type: string, enum: [airtime, data, bills, betting, other] }
+        title: { type: string, minLength: 2, maxLength: 100 }
+        amount: { type: integer, minimum: 1, maximum: 100000000 }
+      required: [serviceType, title, amount]
+    Error:
+      type: object
+      properties:
+        error: { type: string }
+      required: [error]
+  responses:
+    BadRequest:
+      description: Invalid input
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    Unauthorized:
+      description: Sign in is required
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    NotFound:
+      description: Account or record was not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
 

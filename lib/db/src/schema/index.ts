@@ -17,4 +17,9 @@
 //   export type InsertPost = z.infer<typeof insertPostSchema>;
 //   export type Post = typeof postsTable.$inferSelect;
 
-export {}
+export * from "./fintech-profiles";
+export * from "./fintech-security";
+export * from "./fintech-settings";
+export * from "./fintech-transactions";
+export * from "./fintech-wallets";
+export * from "./fintech-notifications";
