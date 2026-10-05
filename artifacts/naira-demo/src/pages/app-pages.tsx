@@ -93,24 +93,30 @@ export function Onboarding() {
   const client = useQueryClient();
   const [, setLocation] = useLocation();
   const create = useCreateMyAccount();
-  const [name, setName] = useState(user?.fullName || user?.firstName || '');
+  const [firstName, setFirstName] = useState(user?.firstName || '');
+  const [lastName, setLastName] = useState(user?.lastName || '');
   const [username, setUsername] = useState(user?.username || '');
+  const [phone, setPhone] = useState('');
+  const [dateOfBirth, setDateOfBirth] = useState('');
   const [pin, setPin] = useState('');
   const [message, setMessage] = useState('');
   const submit = (e: FormEvent) => {
     e.preventDefault(); setMessage('');
-    create.mutate({ data: { originalName: name.trim(), username: username.trim(), pin } }, {
+    create.mutate({ data: { firstName: firstName.trim(), lastName: lastName.trim(), username: username.trim(), phone: phone.trim(), dateOfBirth, pin } }, {
       onSuccess: () => { client.invalidateQueries({ queryKey: getGetMyAccountQueryKey() }); setLocation('/dashboard'); },
       onError: (err) => setMessage(errorText(err)),
     });
   };
-  return <div className="auth-frame"><div className="auth-side"><Brand inverse /><span className="eyebrow">YOUR IN-APP PROFILE</span><h1>A fresh start,<br /><em>on your terms.</em></h1><p>Your new Naira Demo account comes with ₦500,000,000 Virtual Balance / Demo Money. This is not real money.</p><div className="auth-side-note"><ShieldCheck size={18} /> All account activity stays inside the simulation.</div></div><div className="auth-form-wrap"><form className="panel onboarding-form" onSubmit={submit}><div className="eyebrow">ONE LAST STEP</div><h2>Make this account yours</h2><p>Choose the name and username you’ll use inside Naira Demo.</p>
-    <Field label="Original name"><input required minLength={2} maxLength={100} value={name} onChange={e => setName(e.target.value)} placeholder="Your name" data-testid="input-original-name" /></Field>
+  return <div className="auth-frame"><div className="auth-side"><Brand inverse /><span className="eyebrow">YOUR IN-APP PROFILE</span><h1>A fresh start,<br /><em>on your terms.</em></h1><p>Your new Naira Demo account comes with ₦500,000,000 Virtual Balance / Demo Money. This is not real money.</p><div className="auth-side-note"><ShieldCheck size={18} /> All account activity stays inside the simulation.</div></div><div className="auth-form-wrap"><form className="panel onboarding-form" onSubmit={submit}><div className="eyebrow">ONE LAST STEP</div><h2>Make this account yours</h2><p>Choose the profile details you’ll use inside Naira Demo.</p>
+    <Field label="First name"><input required minLength={1} maxLength={50} value={firstName} onChange={e => setFirstName(e.target.value)} placeholder="First name" data-testid="input-first-name" /></Field>
+    <Field label="Last name"><input required minLength={1} maxLength={50} value={lastName} onChange={e => setLastName(e.target.value)} placeholder="Last name" data-testid="input-last-name" /></Field>
     <Field label="Username" hint="3–24 characters. Letters, numbers and underscores."><div className="username-input"><span>@</span><input required minLength={3} maxLength={24} pattern="[a-zA-Z0-9_]+" value={username} onChange={e => setUsername(e.target.value.replace(/^@/, ''))} placeholder="yourname" data-testid="input-username" /></div></Field>
+    <Field label="Nigerian mobile number" hint="Use the international format, such as +2348012345678."><input required type="tel" inputMode="tel" pattern="\+234[789][0-9]{9}" maxLength={14} value={phone} onChange={e => setPhone(e.target.value.replace(/\s/g, ''))} placeholder="+2348012345678" data-testid="input-phone" /></Field>
+    <Field label="Date of birth"><input required type="date" max={new Date().toISOString().slice(0, 10)} value={dateOfBirth} onChange={e => setDateOfBirth(e.target.value)} data-testid="input-date-of-birth" /></Field>
     <Field label="Set a 4–6 digit wallet PIN"><input required type="password" inputMode="numeric" pattern="[0-9]{4,6}" minLength={4} maxLength={6} value={pin} onChange={e => setPin(e.target.value)} placeholder="••••" data-testid="input-pin" /></Field>
     {message && <Notice tone="bad">{message}</Notice>}{create.isError && !message && <Notice tone="bad">{errorText(create.error)}</Notice>}
     <Button type="submit" disabled={create.isPending} className="button-full">{create.isPending ? 'Setting up your account…' : 'Create my demo account'} <ArrowRight size={16} /></Button>
-    <small className="fineprint">By continuing, you’re creating an in-app simulation profile. No real bank account is created.</small>
+    <small className="fineprint">This is an in-app simulation. We do not collect NIN or biometric data, and no real bank account is created.</small>
   </form></div></div>;
 }
 
@@ -238,7 +244,7 @@ export function TransferPage() {
     <form className="search-recipient" onSubmit={doSearch}><div className="search-field"><span>@</span><input value={search} onChange={e => { setSearch(e.target.value); setSearchTerm(''); setRecipient(null); }} placeholder="Username or account number" minLength={3} required data-testid="input-recipient-search" /><button type="submit" aria-label="Find account"><ArrowRight size={17} /></button></div></form>
     {recipientQuery.isFetching && <div className="inline-state">Looking for that account…</div>}
     {recipientQuery.isError && searchTerm && <Notice tone="bad">No account found for “{searchTerm}”. Check the details and try again.</Notice>}
-    {recipient && <div className="recipient-card"><div className="recipient-avatar">{recipient.originalName.slice(0,1).toUpperCase()}</div><div><strong>{recipient.originalName}</strong><span>@{recipient.username}</span><small>Account · {recipient.accountNumber}</small></div><span className="verified"><ShieldCheck size={15} /> Verified</span></div>}
+    {recipient && <div className="recipient-card"><div className="recipient-avatar">{recipient.originalName.slice(0,1).toUpperCase()}</div><div><strong>{recipient.originalName}</strong><span>{recipient.username ? `@${recipient.username}` : 'Username private'}</span><small>Account · {recipient.accountNumber}</small></div><span className="verified"><ShieldCheck size={15} /> Verified</span></div>}
     <div className="transfer-divider" />
     <form className="transfer-fields" onSubmit={send}><div className="transfer-step"><span>02</span><div><h2>How much demo money?</h2><p>Choose an amount to send in the simulation.</p></div></div>
       <Field label="Amount (₦)" hint="Virtual Balance / Demo Money"><div className="amount-input"><span>₦</span><input type="number" min="1" max="100000000" step="1" value={amount} onChange={e => setAmount(e.target.value)} required placeholder="0.00" data-testid="input-transfer-amount" /></div></Field>

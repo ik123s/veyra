@@ -27,12 +27,20 @@ export const getMyAccountResponseVirtualBalanceMin = 0;
 export const GetMyAccountResponse = zod.object({
   "id": zod.string(),
   "originalName": zod.string(),
+  "firstName": zod.string(),
+  "lastName": zod.string(),
   "username": zod.string(),
   "accountNumber": zod.string(),
+  "phone": zod.string().nullable(),
+  "dateOfBirth": zod.coerce.date().nullable(),
   "virtualBalance": zod.number().int().min(getMyAccountResponseVirtualBalanceMin),
   "showUsername": zod.boolean(),
+  "phoneSearchEnabled": zod.boolean(),
   "notificationsEnabled": zod.boolean(),
+  "sessionTimeoutMinutes": zod.union([zod.literal(5),zod.literal(15),zod.literal(30),zod.literal(60)]),
+  "lockOnReturn": zod.boolean(),
   "theme": zod.enum(['light', 'dark']),
+  "isAdmin": zod.boolean(),
   "createdAt": zod.coerce.date(),
   "pinSet": zod.boolean()
 })
@@ -44,18 +52,30 @@ export const GetMyAccountResponse = zod.object({
 export const updateMyAccountBodyOriginalNameMin = 2;
 export const updateMyAccountBodyOriginalNameMax = 100;
 
+export const updateMyAccountBodyFirstNameMax = 50;
+
+export const updateMyAccountBodyLastNameMax = 50;
+
 export const updateMyAccountBodyUsernameMin = 3;
 export const updateMyAccountBodyUsernameMax = 24;
 
 
 export const updateMyAccountBodyUsernameRegExp = new RegExp('^[a-zA-Z0-9_]+$');
+export const updateMyAccountBodyPhoneRegExp = new RegExp('^\\+234[789][0-9]{9}$');
 
 
 export const UpdateMyAccountBody = zod.object({
   "originalName": zod.string().min(updateMyAccountBodyOriginalNameMin).max(updateMyAccountBodyOriginalNameMax).optional(),
+  "firstName": zod.string().min(1).max(updateMyAccountBodyFirstNameMax).optional(),
+  "lastName": zod.string().min(1).max(updateMyAccountBodyLastNameMax).optional(),
   "username": zod.string().min(updateMyAccountBodyUsernameMin).max(updateMyAccountBodyUsernameMax).regex(updateMyAccountBodyUsernameRegExp).optional(),
+  "phone": zod.string().regex(updateMyAccountBodyPhoneRegExp).nullish(),
+  "dateOfBirth": zod.coerce.date().nullish(),
   "showUsername": zod.boolean().optional(),
+  "phoneSearchEnabled": zod.boolean().optional(),
   "notificationsEnabled": zod.boolean().optional(),
+  "sessionTimeoutMinutes": zod.union([zod.literal(5),zod.literal(15),zod.literal(30),zod.literal(60)]).optional(),
+  "lockOnReturn": zod.boolean().optional(),
   "theme": zod.enum(['light', 'dark']).optional()
 })
 
@@ -66,35 +86,48 @@ export const updateMyAccountResponseVirtualBalanceMin = 0;
 export const UpdateMyAccountResponse = zod.object({
   "id": zod.string(),
   "originalName": zod.string(),
+  "firstName": zod.string(),
+  "lastName": zod.string(),
   "username": zod.string(),
   "accountNumber": zod.string(),
+  "phone": zod.string().nullable(),
+  "dateOfBirth": zod.coerce.date().nullable(),
   "virtualBalance": zod.number().int().min(updateMyAccountResponseVirtualBalanceMin),
   "showUsername": zod.boolean(),
+  "phoneSearchEnabled": zod.boolean(),
   "notificationsEnabled": zod.boolean(),
+  "sessionTimeoutMinutes": zod.union([zod.literal(5),zod.literal(15),zod.literal(30),zod.literal(60)]),
+  "lockOnReturn": zod.boolean(),
   "theme": zod.enum(['light', 'dark']),
+  "isAdmin": zod.boolean(),
   "createdAt": zod.coerce.date(),
   "pinSet": zod.boolean()
 })
 
 
 /**
- * Creates one private profile with a ₦50,000 Virtual Balance / Demo Money starting balance. The balance has no real monetary value.
+ * Creates one private profile with a ₦500,000,000 Virtual Balance / Demo Money starting balance. The balance has no real monetary value.
  * @summary Create the authenticated user's in-app account and demo wallet
  */
-export const createMyAccountBodyOriginalNameMin = 2;
-export const createMyAccountBodyOriginalNameMax = 100;
+export const createMyAccountBodyFirstNameMax = 50;
+
+export const createMyAccountBodyLastNameMax = 50;
 
 export const createMyAccountBodyUsernameMin = 3;
 export const createMyAccountBodyUsernameMax = 24;
 
 
 export const createMyAccountBodyUsernameRegExp = new RegExp('^[a-zA-Z0-9_]+$');
+export const createMyAccountBodyPhoneRegExp = new RegExp('^\\+234[789][0-9]{9}$');
 export const createMyAccountBodyPinRegExp = new RegExp('^[0-9]{4,6}$');
 
 
 export const CreateMyAccountBody = zod.object({
-  "originalName": zod.string().min(createMyAccountBodyOriginalNameMin).max(createMyAccountBodyOriginalNameMax),
+  "firstName": zod.string().min(1).max(createMyAccountBodyFirstNameMax),
+  "lastName": zod.string().min(1).max(createMyAccountBodyLastNameMax),
   "username": zod.string().min(createMyAccountBodyUsernameMin).max(createMyAccountBodyUsernameMax).regex(createMyAccountBodyUsernameRegExp),
+  "phone": zod.string().regex(createMyAccountBodyPhoneRegExp),
+  "dateOfBirth": zod.coerce.date(),
   "pin": zod.string().regex(createMyAccountBodyPinRegExp)
 })
 
@@ -105,12 +138,20 @@ export const createMyAccountResponseVirtualBalanceMin = 0;
 export const CreateMyAccountResponse = zod.object({
   "id": zod.string(),
   "originalName": zod.string(),
+  "firstName": zod.string(),
+  "lastName": zod.string(),
   "username": zod.string(),
   "accountNumber": zod.string(),
+  "phone": zod.string().nullable(),
+  "dateOfBirth": zod.coerce.date().nullable(),
   "virtualBalance": zod.number().int().min(createMyAccountResponseVirtualBalanceMin),
   "showUsername": zod.boolean(),
+  "phoneSearchEnabled": zod.boolean(),
   "notificationsEnabled": zod.boolean(),
+  "sessionTimeoutMinutes": zod.union([zod.literal(5),zod.literal(15),zod.literal(30),zod.literal(60)]),
+  "lockOnReturn": zod.boolean(),
   "theme": zod.enum(['light', 'dark']),
+  "isAdmin": zod.boolean(),
   "createdAt": zod.coerce.date(),
   "pinSet": zod.boolean()
 })
@@ -129,7 +170,7 @@ export const SearchAccountQueryParams = zod.object({
 
 export const SearchAccountResponse = zod.object({
   "originalName": zod.string(),
-  "username": zod.string(),
+  "username": zod.string().nullable(),
   "accountNumber": zod.string()
 })
 

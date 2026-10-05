@@ -8,16 +8,24 @@
 
 export interface AccountRegistrationInput {
   /**
-     * @minLength 2
-     * @maxLength 100
+     * @minLength 1
+     * @maxLength 50
      */
-  originalName: string;
+  firstName: string;
+  /**
+     * @minLength 1
+     * @maxLength 50
+     */
+  lastName: string;
   /**
      * @minLength 3
      * @maxLength 24
      * @pattern ^[a-zA-Z0-9_]+$
      */
   username: string;
+  /** @pattern ^\+234[789][0-9]{9}$ */
+  phone: string;
+  dateOfBirth: Date;
   /** @pattern ^[0-9]{4,6}$ */
   pin: string;
 }

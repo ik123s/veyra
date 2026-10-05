@@ -84,6 +84,12 @@ paths:
             schema:
               $ref: "#/components/schemas/AccountRegistrationInput"
       responses:
+        "200":
+          description: Existing account returned after a safe retry
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProfile"
         "201":
           description: Account created with the initial demo balance
           content:
@@ -95,7 +101,7 @@ paths:
         "401":
           $ref: "#/components/responses/Unauthorized"
         "409":
-          description: Username is already in use or an account already exists
+          description: Username or phone number is already in use
           content:
             application/json:
               schema:
@@ -355,7 +361,7 @@ components:
       type: object
       properties:
         originalName: { type: string }
-        username: { type: string }
+        username: { type: ["string", "null"] }
         accountNumber: { type: string }
       required: [originalName, username, accountNumber]
     WalletStats:

@@ -9,6 +9,16 @@ export interface HealthStatus {
   status: string;
 }
 
+export type UserProfileSessionTimeoutMinutes = typeof UserProfileSessionTimeoutMinutes[keyof typeof UserProfileSessionTimeoutMinutes];
+
+
+export const UserProfileSessionTimeoutMinutes = {
+  NUMBER_5: 5,
+  NUMBER_15: 15,
+  NUMBER_30: 30,
+  NUMBER_60: 60,
+} as const;
+
 export type UserProfileTheme = typeof UserProfileTheme[keyof typeof UserProfileTheme];
 
 
@@ -20,32 +30,60 @@ export const UserProfileTheme = {
 export interface UserProfile {
   id: string;
   originalName: string;
+  firstName: string;
+  lastName: string;
   username: string;
   accountNumber: string;
+  /** @nullable */
+  phone: string | null;
+  /** @nullable */
+  dateOfBirth: string | null;
   /** @minimum 0 */
   virtualBalance: number;
   showUsername: boolean;
+  phoneSearchEnabled: boolean;
   notificationsEnabled: boolean;
+  sessionTimeoutMinutes: UserProfileSessionTimeoutMinutes;
+  lockOnReturn: boolean;
   theme: UserProfileTheme;
+  isAdmin: boolean;
   createdAt: string;
   pinSet: boolean;
 }
 
 export interface AccountRegistrationInput {
   /**
-     * @minLength 2
-     * @maxLength 100
+     * @minLength 1
+     * @maxLength 50
      */
-  originalName: string;
+  firstName: string;
+  /**
+     * @minLength 1
+     * @maxLength 50
+     */
+  lastName: string;
   /**
      * @minLength 3
      * @maxLength 24
      * @pattern ^[a-zA-Z0-9_]+$
      */
   username: string;
+  /** @pattern ^\+234[789][0-9]{9}$ */
+  phone: string;
+  dateOfBirth: string;
   /** @pattern ^[0-9]{4,6}$ */
   pin: string;
 }
+
+export type ProfileUpdateSessionTimeoutMinutes = typeof ProfileUpdateSessionTimeoutMinutes[keyof typeof ProfileUpdateSessionTimeoutMinutes];
+
+
+export const ProfileUpdateSessionTimeoutMinutes = {
+  NUMBER_5: 5,
+  NUMBER_15: 15,
+  NUMBER_30: 30,
+  NUMBER_60: 60,
+} as const;
 
 export type ProfileUpdateTheme = typeof ProfileUpdateTheme[keyof typeof ProfileUpdateTheme];
 
@@ -62,19 +100,40 @@ export interface ProfileUpdate {
      */
   originalName?: string;
   /**
+     * @minLength 1
+     * @maxLength 50
+     */
+  firstName?: string;
+  /**
+     * @minLength 1
+     * @maxLength 50
+     */
+  lastName?: string;
+  /**
      * @minLength 3
      * @maxLength 24
      * @pattern ^[a-zA-Z0-9_]+$
      */
   username?: string;
+  /**
+     * @nullable
+     * @pattern ^\+234[789][0-9]{9}$
+     */
+  phone?: string | null;
+  /** @nullable */
+  dateOfBirth?: string | null;
   showUsername?: boolean;
+  phoneSearchEnabled?: boolean;
   notificationsEnabled?: boolean;
+  sessionTimeoutMinutes?: ProfileUpdateSessionTimeoutMinutes;
+  lockOnReturn?: boolean;
   theme?: ProfileUpdateTheme;
 }
 
 export interface Recipient {
   originalName: string;
-  username: string;
+  /** @nullable */
+  username: string | null;
   accountNumber: string;
 }
 

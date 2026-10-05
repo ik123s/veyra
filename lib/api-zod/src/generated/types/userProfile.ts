@@ -5,18 +5,29 @@
  * Private account and internal-only virtual wallet API for the Naira Demo simulation.
  * OpenAPI spec version: 0.1.0
  */
+import type { UserProfileSessionTimeoutMinutes } from './userProfileSessionTimeoutMinutes';
 import type { UserProfileTheme } from './userProfileTheme';
 
 export interface UserProfile {
   id: string;
   originalName: string;
+  firstName: string;
+  lastName: string;
   username: string;
   accountNumber: string;
+  /** @nullable */
+  phone: string | null;
+  /** @nullable */
+  dateOfBirth: Date | null;
   /** @minimum 0 */
   virtualBalance: number;
   showUsername: boolean;
+  phoneSearchEnabled: boolean;
   notificationsEnabled: boolean;
+  sessionTimeoutMinutes: UserProfileSessionTimeoutMinutes;
+  lockOnReturn: boolean;
   theme: UserProfileTheme;
+  isAdmin: boolean;
   createdAt: Date;
   pinSet: boolean;
 }

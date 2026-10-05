@@ -5,6 +5,7 @@
  * Private account and internal-only virtual wallet API for the Naira Demo simulation.
  * OpenAPI spec version: 0.1.0
  */
+import type { ProfileUpdateSessionTimeoutMinutes } from './profileUpdateSessionTimeoutMinutes';
 import type { ProfileUpdateTheme } from './profileUpdateTheme';
 
 export interface ProfileUpdate {
@@ -14,12 +15,32 @@ export interface ProfileUpdate {
      */
   originalName?: string;
   /**
+     * @minLength 1
+     * @maxLength 50
+     */
+  firstName?: string;
+  /**
+     * @minLength 1
+     * @maxLength 50
+     */
+  lastName?: string;
+  /**
      * @minLength 3
      * @maxLength 24
      * @pattern ^[a-zA-Z0-9_]+$
      */
   username?: string;
+  /**
+     * @nullable
+     * @pattern ^\+234[789][0-9]{9}$
+     */
+  phone?: string | null;
+  /** @nullable */
+  dateOfBirth?: Date | null;
   showUsername?: boolean;
+  phoneSearchEnabled?: boolean;
   notificationsEnabled?: boolean;
+  sessionTimeoutMinutes?: ProfileUpdateSessionTimeoutMinutes;
+  lockOnReturn?: boolean;
   theme?: ProfileUpdateTheme;
 }

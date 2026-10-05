@@ -8,6 +8,7 @@
 
 export interface Recipient {
   originalName: string;
-  username: string;
+  /** @nullable */
+  username: string | null;
   accountNumber: string;
 }

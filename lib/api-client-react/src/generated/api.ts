@@ -318,7 +318,7 @@ export const getCreateMyAccountUrl = () => {
 }
 
 /**
- * Creates one private profile with a ₦50,000 Virtual Balance / Demo Money starting balance. The balance has no real monetary value.
+ * Creates one private profile with a ₦500,000,000 Virtual Balance / Demo Money starting balance. The balance has no real monetary value.
  * @summary Create the authenticated user's in-app account and demo wallet
  */
 export const createMyAccount = async (accountRegistrationInput: AccountRegistrationInput, options?: Parameters<typeof customFetch>[1]): Promise<UserProfile> => {
