@@ -13,6 +13,7 @@ import {
   SecurityPage, ServicePage, SettingsPage, TransactionDetailPage, TransactionsPage,
   TransferPage, WalletPage
 } from '@/pages/app-pages';
+import { CardsPage, MePage, RewardsPage, WealthPage, DashboardExperience } from '@/pages/experience';
 
 const queryClient = new QueryClient();
 const clerkPubKey = publishableKeyFromHost(window.location.hostname, import.meta.env.VITE_CLERK_PUBLISHABLE_KEY);
@@ -115,7 +116,11 @@ function RouteSwitch() {
       <Route path="/sign-in/*?" component={SignInPage} />
       <Route path="/sign-up/*?" component={SignUpPage} />
       <Route path="/onboarding"><Protected><Onboarding /></Protected></Route>
-      <Route path="/dashboard"><Protected><Dashboard /></Protected></Route>
+      <Route path="/dashboard"><Protected><DashboardExperience /></Protected></Route>
+      <Route path="/rewards"><Protected><RewardsPage /></Protected></Route>
+      <Route path="/wealth"><Protected><WealthPage /></Protected></Route>
+      <Route path="/cards"><Protected><CardsPage /></Protected></Route>
+      <Route path="/me"><Protected><MePage /></Protected></Route>
       <Route path="/wallet"><Protected><WalletPage /></Protected></Route>
       <Route path="/transfer"><Protected><TransferPage /></Protected></Route>
       <Route path="/receive"><Protected><ReceivePage /></Protected></Route>
